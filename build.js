@@ -2,11 +2,6 @@ const fs = require('fs');
 const path = require('path');
 
 const srcDir = path.join(__dirname, 'src');
-const distDir = path.join(__dirname, 'dist');
-
-if (!fs.existsSync(distDir)) {
-    fs.mkdirSync(distDir);
-}
 
 function readFile(filePath) {
     return fs.readFileSync(path.join(srcDir, filePath), 'utf8');
@@ -76,8 +71,34 @@ function UILib:Init(title)
     return publicWin
 end
 
-return UILib
+-- =======================================================
+-- EKSEKUSI TEMPLATE (BAGIAN BAWAH INI ADALAH TESTING)
+-- =======================================================
+
+local myUI = UILib:Init("SVFG NextUI")
+
+local mainTab = myUI:AddTab("Main")
+
+mainTab:AddButton("Test Button", function()
+    print("Button Clicked!")
+end)
+
+mainTab:AddToggle("Auto Farm", false, function(state)
+    print("Toggle State:", state)
+end)
+
+mainTab:AddSlider("WalkSpeed", 16, 100, 16, function(value)
+    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+    end
+end)
+
+local settingsTab = myUI:AddTab("Settings")
+
+settingsTab:AddDropdown("Select Target", {"Player 1", "Player 2", "Player 3"}, function(selected)
+    print("Selected:", selected)
+end)
 `;
 
-fs.writeFileSync(path.join(distDir, 'main.lua'), output);
-console.log('Build successful! File output telah tersimpan di dist/main.lua');
+fs.writeFileSync(path.join(__dirname, 'template.lua'), output);
+console.log('Build successful! template.lua updated.');

@@ -12,7 +12,6 @@ return function(Theme)
             guiParent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
         end
         
-        -- Hapus GUI lama jika ada (Auto-Refresh)
         for _, gui in pairs(guiParent:GetChildren()) do
             if gui.Name == "NextUI_Universal" then
                 gui:Destroy()
@@ -26,72 +25,62 @@ return function(Theme)
         screenGui.Parent = guiParent
         
         -- ==========================================
-        -- INTRO CINEMATIC SEQUENCE
+        -- INTRO CINEMATIC SEQUENCE (DIPERBAIKI)
         -- ==========================================
         local introBg = Instance.new("Frame")
         introBg.Size = UDim2.new(1, 0, 1, 0)
-        introBg.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
+        introBg.Position = UDim2.new(0, 0, 0, 0)
+        introBg.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
+        introBg.BorderSizePixel = 0
         introBg.ZIndex = 100
         introBg.Parent = screenGui
         
-        local introContainer = Instance.new("Frame")
-        introContainer.Size = UDim2.new(1, 0, 1, 0)
-        introContainer.BackgroundTransparency = 1
-        introContainer.ZIndex = 101
-        introContainer.Parent = introBg
-        
-        local introList = Instance.new("UIListLayout")
-        introList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        introList.VerticalAlignment = Enum.VerticalAlignment.Center
-        introList.SortOrder = Enum.SortOrder.LayoutOrder
-        introList.Padding = UDim.new(0, 5)
-        introList.Parent = introContainer
-        
         local introText = Instance.new("TextLabel")
-        introText.Size = UDim2.new(1, 0, 0, 50)
+        introText.Size = UDim2.new(1, 0, 0, 60)
+        introText.Position = UDim2.new(0, 0, 0.5, -45)
         introText.BackgroundTransparency = 1
         introText.Text = "SVFG"
         introText.Font = Enum.Font.GothamBlack
-        introText.TextSize = 45
+        introText.TextSize = 48
         introText.TextColor3 = Color3.fromRGB(255, 255, 255)
-        introText.TextTransparency = 1
-        introText.Parent = introContainer
+        introText.ZIndex = 101
+        introText.Parent = introBg
         
         local introSubText = Instance.new("TextLabel")
         introSubText.Size = UDim2.new(1, 0, 0, 30)
+        introSubText.Position = UDim2.new(0, 0, 0.5, 15)
         introSubText.BackgroundTransparency = 1
         introSubText.Text = "NextUI"
         introSubText.Font = Enum.Font.GothamMedium
-        introSubText.TextSize = 22
+        introSubText.TextSize = 24
         introSubText.TextColor3 = Theme.Accent
-        introSubText.TextTransparency = 1
-        introSubText.Parent = introContainer
+        introSubText.ZIndex = 101
+        introSubText.Parent = introBg
         
         -- ==========================================
-        -- MAIN WINDOW (CANVAS GROUP UNTUK FADE)
+        -- MAIN WINDOW
         -- ==========================================
-        local mainFrm = Instance.new("CanvasGroup")
+        -- Menggunakan Frame standar agar tidak buggy di executor
+        local mainFrm = Instance.new("Frame")
         mainFrm.Size = UDim2.new(0, 550, 0, 380)
-        mainFrm.Position = UDim2.new(0.5, -275, 0.5, -170) -- Mulai agak ke bawah
+        mainFrm.Position = UDim2.new(0.5, -275, 1, 100) -- Mulai dari bawah layar
         mainFrm.BackgroundColor3 = Theme.Background
-        mainFrm.BackgroundTransparency = Theme.BackgroundTransparency
         mainFrm.BorderSizePixel = 0
-        mainFrm.GroupTransparency = 1 -- Sembunyikan awal
+        mainFrm.ClipsDescendants = true
         mainFrm.Parent = screenGui
         
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = Theme.CornerRadius
-        corner.Parent = mainFrm
+        local mainCorner = Instance.new("UICorner")
+        mainCorner.CornerRadius = Theme.CornerRadius
+        mainCorner.Parent = mainFrm
         
         local topBar = Instance.new("Frame")
         topBar.Size = UDim2.new(1, 0, 0, 45)
         topBar.BackgroundColor3 = Theme.TopBar
-        topBar.BackgroundTransparency = Theme.TopBarTransparency
         topBar.BorderSizePixel = 0
         topBar.Parent = mainFrm
         
         local titleLbl = Instance.new("TextLabel")
-        titleLbl.Size = UDim2.new(1, -20, 1, 0)
+        titleLbl.Size = UDim2.new(1, -120, 1, 0)
         titleLbl.Position = UDim2.new(0, 20, 0, 0)
         titleLbl.BackgroundTransparency = 1
         titleLbl.Text = titleText
@@ -109,6 +98,96 @@ return function(Theme)
         separator.BorderSizePixel = 0
         separator.Parent = topBar
         
+        -- ==========================================
+        -- WINDOW CONTROLS (Min, Max, Close)
+        -- ==========================================
+        local ctrlContainer = Instance.new("Frame")
+        ctrlContainer.Size = UDim2.new(0, 90, 1, 0)
+        ctrlContainer.Position = UDim2.new(1, -95, 0, 0)
+        ctrlContainer.BackgroundTransparency = 1
+        ctrlContainer.Parent = topBar
+        
+        local ctrlLayout = Instance.new("UIListLayout")
+        ctrlLayout.FillDirection = Enum.FillDirection.Horizontal
+        ctrlLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+        ctrlLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        ctrlLayout.Padding = UDim.new(0, 8)
+        ctrlLayout.Parent = ctrlContainer
+        
+        local function createCtrlBtn(txt, hoverColor)
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(0, 24, 0, 24)
+            btn.BackgroundColor3 = Theme.Background
+            btn.Text = txt
+            btn.TextColor3 = Theme.TextDim
+            btn.Font = Enum.Font.GothamBold
+            btn.TextSize = 12
+            btn.AutoButtonColor = false
+            
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(1, 0) -- Bulat sempurna
+            corner.Parent = btn
+            
+            btn.MouseEnter:Connect(function()
+                tweenSvc:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor, TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+            end)
+            btn.MouseLeave:Connect(function()
+                tweenSvc:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Background, TextColor3 = Theme.TextDim}):Play()
+            end)
+            return btn
+        end
+        
+        local minBtn = createCtrlBtn("-", Color3.fromRGB(200, 150, 50))
+        local maxBtn = createCtrlBtn("□", Color3.fromRGB(50, 200, 100))
+        local closeBtn = createCtrlBtn("X", Color3.fromRGB(220, 50, 50))
+        
+        minBtn.Parent = ctrlContainer
+        maxBtn.Parent = ctrlContainer
+        closeBtn.Parent = ctrlContainer
+        
+        local isMinimized = false
+        local isMaximized = false
+        local oldSize = UDim2.new(0, 550, 0, 380)
+        local oldPos = UDim2.new(0.5, -275, 0.5, -190)
+        
+        minBtn.MouseButton1Click:Connect(function()
+            isMinimized = not isMinimized
+            if isMinimized then
+                tweenSvc:Create(mainFrm, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0, mainFrm.Size.X.Offset, 0, 45)}):Play()
+            else
+                local targetSize = isMaximized and UDim2.new(1, 0, 1, 0) or oldSize
+                tweenSvc:Create(mainFrm, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = targetSize}):Play()
+            end
+        end)
+        
+        maxBtn.MouseButton1Click:Connect(function()
+            if isMinimized then return end
+            isMaximized = not isMaximized
+            if isMaximized then
+                oldPos = mainFrm.Position
+                tweenSvc:Create(mainFrm, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(1, 0, 1, 0),
+                    Position = UDim2.new(0, 0, 0, 0)
+                }):Play()
+                mainCorner.CornerRadius = UDim.new(0, 0)
+            else
+                tweenSvc:Create(mainFrm, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                    Size = oldSize,
+                    Position = oldPos
+                }):Play()
+                mainCorner.CornerRadius = Theme.CornerRadius
+            end
+        end)
+        
+        closeBtn.MouseButton1Click:Connect(function()
+            tweenSvc:Create(mainFrm, TweenInfo.new(0.3), {Size = UDim2.new(0, 550, 0, 0), Position = UDim2.new(0.5, -275, 0.5, 0)}):Play()
+            task.wait(0.3)
+            screenGui:Destroy()
+        end)
+
+        -- ==========================================
+        -- CONTENT LAYOUT
+        -- ==========================================
         local tabContainer = Instance.new("ScrollingFrame")
         tabContainer.Size = UDim2.new(0, 150, 1, -45)
         tabContainer.Position = UDim2.new(0, 0, 0, 45)
@@ -127,7 +206,6 @@ return function(Theme)
         tabPadding.PaddingRight = UDim.new(0, 12)
         tabPadding.Parent = tabContainer
         
-        -- Garis vertikal tab
         local vSeparator = Instance.new("Frame")
         vSeparator.Size = UDim2.new(0, 1, 1, -45)
         vSeparator.Position = UDim2.new(0, 150, 0, 45)
@@ -142,11 +220,15 @@ return function(Theme)
         contentContainer.BackgroundTransparency = 1
         contentContainer.Parent = mainFrm
         
-        -- Sistem Drag
+        -- ==========================================
+        -- DRAG SYSTEM
+        -- ==========================================
         local dragging, dragInput, dragStart, startPos
         local function update(input)
+            if isMaximized then return end
             local delta = input.Position - dragStart
             mainFrm.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            oldPos = mainFrm.Position
         end
         
         topBar.InputBegan:Connect(function(input)
@@ -170,32 +252,29 @@ return function(Theme)
             if input == dragInput and dragging then update(input) end
         end)
         
-        -- JALANKAN ANIMASI INTRO
+        -- ==========================================
+        -- JALANKAN ANIMASI INTRO & MUNCUL
+        -- ==========================================
         task.spawn(function()
-            -- 1. Fade In SVFG & Scale
-            tweenSvc:Create(introText, TweenInfo.new(0.8, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
-            tweenSvc:Create(introText, TweenInfo.new(2.5, Enum.EasingStyle.Linear), {TextSize = 48}):Play()
-            task.wait(0.6)
-            
-            -- 2. Fade In NextUI
-            tweenSvc:Create(introSubText, TweenInfo.new(0.6, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
+            -- Efek intro teks
+            tweenSvc:Create(introText, TweenInfo.new(1.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {TextSize = 55}):Play()
             task.wait(1.5)
             
-            -- 3. Fade Out Text
-            tweenSvc:Create(introText, TweenInfo.new(0.5), {TextTransparency = 1, TextSize = 52}):Play()
-            tweenSvc:Create(introSubText, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
-            task.wait(0.3)
-            
-            -- 4. Fade Out Bg
-            tweenSvc:Create(introBg, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+            -- Hilangkan teks intro dengan Tween
+            tweenSvc:Create(introText, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+            tweenSvc:Create(introSubText, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
             task.wait(0.5)
-            introBg:Destroy()
             
-            -- 5. Animasi Main UI Muncul (Fade + Slide Up)
+            -- Hilangkan background intro (Hitam)
+            tweenSvc:Create(introBg, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
+            
+            -- Luncurkan UI Utama dari bawah ke tengah
             tweenSvc:Create(mainFrm, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                GroupTransparency = 0,
                 Position = UDim2.new(0.5, -275, 0.5, -190)
             }):Play()
+            
+            task.wait(0.6)
+            introBg:Destroy()
         end)
         
         winObj.Container = contentContainer
