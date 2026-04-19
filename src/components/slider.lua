@@ -6,17 +6,16 @@ return function(Theme)
         local value = default or min
         
         local sliderFrm = Instance.new("Frame")
-        sliderFrm.Size = UDim2.new(1, 0, 0, 55)
+        sliderFrm.Size = UDim2.new(1, 0, 0, 42) -- Diubah menjadi 42px agar konsisten grid
         sliderFrm.BackgroundColor3 = Theme.ElementBg
-        sliderFrm.Parent = tabObj.Page
         
         local corner = Instance.new("UICorner")
         corner.CornerRadius = Theme.CornerRadius
         corner.Parent = sliderFrm
         
         local lbl = Instance.new("TextLabel")
-        lbl.Size = UDim2.new(1, -20, 0, 25)
-        lbl.Position = UDim2.new(0, 15, 0, 5)
+        lbl.Size = UDim2.new(1, -60, 0, 20)
+        lbl.Position = UDim2.new(0, 15, 0, 6)
         lbl.BackgroundTransparency = 1
         lbl.Text = text
         lbl.TextColor3 = Theme.TextDim
@@ -26,8 +25,8 @@ return function(Theme)
         lbl.Parent = sliderFrm
         
         local valLbl = Instance.new("TextLabel")
-        valLbl.Size = UDim2.new(0, 50, 0, 25)
-        valLbl.Position = UDim2.new(1, -65, 0, 5)
+        valLbl.Size = UDim2.new(0, 40, 0, 20)
+        valLbl.Position = UDim2.new(1, -55, 0, 6)
         valLbl.BackgroundTransparency = 1
         valLbl.Text = tostring(value)
         valLbl.TextColor3 = Theme.TextMain
@@ -37,8 +36,8 @@ return function(Theme)
         valLbl.Parent = sliderFrm
         
         local sliderBg = Instance.new("Frame")
-        sliderBg.Size = UDim2.new(1, -30, 0, 8)
-        sliderBg.Position = UDim2.new(0, 15, 0, 36)
+        sliderBg.Size = UDim2.new(1, -30, 0, 4)
+        sliderBg.Position = UDim2.new(0, 15, 1, -12)
         sliderBg.BackgroundColor3 = Theme.Background
         sliderBg.Parent = sliderFrm
         local bgCorner = Instance.new("UICorner")
@@ -53,10 +52,9 @@ return function(Theme)
         fillCorner.CornerRadius = UDim.new(1, 0)
         fillCorner.Parent = sliderFill
         
-        -- Slider thumb (lingkaran putih ala modern UI)
         local thumb = Instance.new("Frame")
-        thumb.Size = UDim2.new(0, 14, 0, 14)
-        thumb.Position = UDim2.new(1, -7, 0.5, -7)
+        thumb.Size = UDim2.new(0, 12, 0, 12)
+        thumb.Position = UDim2.new(1, -6, 0.5, -6)
         thumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         thumb.Parent = sliderFill
         local thumbCorner = Instance.new("UICorner")
@@ -66,7 +64,7 @@ return function(Theme)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(1, 0, 1, 0)
         btn.Position = UDim2.new(0, 0, -1, 0)
-        btn.Size = UDim2.new(1, 0, 3, 0) -- Lebih besar agar mudah disentuh
+        btn.Size = UDim2.new(1, 0, 3, 0) 
         btn.BackgroundTransparency = 1
         btn.Text = ""
         btn.Parent = sliderBg
@@ -87,7 +85,7 @@ return function(Theme)
         btn.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = true
-                tweenSvc:Create(thumb, TweenInfo.new(0.1), {Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(1, -9, 0.5, -9)}):Play()
+                tweenSvc:Create(thumb, TweenInfo.new(0.1), {Size = UDim2.new(0, 16, 0, 16), Position = UDim2.new(1, -8, 0.5, -8)}):Play()
                 update(input)
             end
         end)
@@ -95,7 +93,7 @@ return function(Theme)
         btn.InputEnded:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = false
-                tweenSvc:Create(thumb, TweenInfo.new(0.1), {Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(1, -7, 0.5, -7)}):Play()
+                tweenSvc:Create(thumb, TweenInfo.new(0.1), {Size = UDim2.new(0, 12, 0, 12), Position = UDim2.new(1, -6, 0.5, -6)}):Play()
             end
         end)
         
@@ -104,5 +102,7 @@ return function(Theme)
                 update(input)
             end
         end)
+        
+        tabObj:AddElement(sliderFrm)
     end
 end

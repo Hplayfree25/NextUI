@@ -6,7 +6,6 @@ return function(Theme)
         dropdownFrm.Size = UDim2.new(1, 0, 0, 42)
         dropdownFrm.BackgroundColor3 = Theme.ElementBg
         dropdownFrm.ClipsDescendants = true
-        dropdownFrm.Parent = tabObj.Page
         
         local corner = Instance.new("UICorner")
         corner.CornerRadius = Theme.CornerRadius
@@ -95,5 +94,7 @@ return function(Theme)
                 if not s then warn("UI Dropdown Error: " .. tostring(e)) end
             end)
         end
+        
+        tabObj:AddElement(dropdownFrm)
     end
 end

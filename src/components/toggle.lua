@@ -9,7 +9,6 @@ return function(Theme)
         toggleFrm.BackgroundColor3 = Theme.ElementBg
         toggleFrm.Text = ""
         toggleFrm.AutoButtonColor = false
-        toggleFrm.Parent = tabObj.Page
         
         local corner = Instance.new("UICorner")
         corner.CornerRadius = Theme.CornerRadius
@@ -26,7 +25,6 @@ return function(Theme)
         lbl.TextSize = 13
         lbl.Parent = toggleFrm
         
-        -- Background indikator (ala iOS/Slack toggle)
         local indicatorBg = Instance.new("Frame")
         indicatorBg.Size = UDim2.new(0, 42, 0, 22)
         indicatorBg.Position = UDim2.new(1, -55, 0.5, -11)
@@ -64,5 +62,7 @@ return function(Theme)
         if toggled then
             lbl.TextColor3 = Theme.TextMain
         end
+        
+        tabObj:AddElement(toggleFrm)
     end
 end

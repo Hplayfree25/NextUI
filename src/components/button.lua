@@ -10,7 +10,6 @@ return function(Theme)
         btn.Font = Enum.Font.GothamSemibold
         btn.TextSize = 13
         btn.AutoButtonColor = false
-        btn.Parent = tabObj.Page
         
         local corner = Instance.new("UICorner")
         corner.CornerRadius = Theme.CornerRadius
@@ -38,5 +37,7 @@ return function(Theme)
             local s, e = pcall(callback)
             if not s then warn("UI Button Error: " .. tostring(e)) end
         end)
+        
+        tabObj:AddElement(btn)
     end
 end

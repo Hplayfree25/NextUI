@@ -6,6 +6,8 @@ return function(Theme)
     
     function WindowLib:Create(titleText)
         local winObj = {}
+        winObj.IsMaximized = false
+        winObj.MaximizeEvent = Instance.new("BindableEvent")
         
         local guiParent = game:GetService("CoreGui")
         if not pcall(function() local _ = guiParent.Name end) then
@@ -25,30 +27,28 @@ return function(Theme)
         screenGui.Parent = guiParent
         
         -- ==========================================
-        -- INTRO CINEMATIC SEQUENCE (NO BACKGROUND, MODERN)
+        -- INTRO CINEMATIC
         -- ==========================================
         local introBg = Instance.new("Frame")
         introBg.Size = UDim2.new(1, 0, 1, 0)
         introBg.Position = UDim2.new(0, 0, 0, 0)
-        introBg.BackgroundTransparency = 1 -- Transparan 100%
+        introBg.BackgroundTransparency = 1
         introBg.BorderSizePixel = 0
         introBg.ZIndex = 100
         introBg.Parent = screenGui
         
-        -- Teks utama
         local introText = Instance.new("TextLabel")
         introText.Size = UDim2.new(1, 0, 0, 80)
-        introText.Position = UDim2.new(0, 0, 0.6, 0) -- Mulai dari bawah
+        introText.Position = UDim2.new(0, 0, 0.6, 0)
         introText.BackgroundTransparency = 1
         introText.Text = "NextUI"
         introText.Font = Enum.Font.GothamBlack
-        introText.TextSize = 5 -- Mulai sangat kecil
+        introText.TextSize = 5
         introText.TextColor3 = Color3.fromRGB(255, 255, 255)
-        introText.TextTransparency = 1 -- Transparan
+        introText.TextTransparency = 1
         introText.ZIndex = 102
         introText.Parent = introBg
         
-        -- Teks bayangan (Glow effect)
         local glowText = Instance.new("TextLabel")
         glowText.Size = UDim2.new(1, 0, 0, 80)
         glowText.Position = UDim2.new(0, 0, 0.6, 0)
@@ -56,7 +56,7 @@ return function(Theme)
         glowText.Text = "NextUI"
         glowText.Font = Enum.Font.GothamBlack
         glowText.TextSize = 5
-        glowText.TextColor3 = Theme.Accent -- Warna Blurple
+        glowText.TextColor3 = Theme.Accent
         glowText.TextTransparency = 1
         glowText.ZIndex = 101
         glowText.Parent = introBg
@@ -66,7 +66,8 @@ return function(Theme)
         -- ==========================================
         local mainFrm = Instance.new("Frame")
         mainFrm.Size = UDim2.new(0, 550, 0, 380)
-        mainFrm.Position = UDim2.new(0.5, -275, 1, 100) -- Mulai dari luar bawah layar
+        mainFrm.AnchorPoint = Vector2.new(0.5, 0.5)
+        mainFrm.Position = UDim2.new(0.5, 0, 1.5, 0)
         mainFrm.BackgroundColor3 = Theme.Background
         mainFrm.BorderSizePixel = 0
         mainFrm.ClipsDescendants = true
@@ -76,15 +77,29 @@ return function(Theme)
         mainCorner.CornerRadius = Theme.CornerRadius
         mainCorner.Parent = mainFrm
         
+        local uiScale = Instance.new("UIScale")
+        uiScale.Scale = 1
+        uiScale.Parent = mainFrm
+        
         local topBar = Instance.new("Frame")
         topBar.Size = UDim2.new(1, 0, 0, 45)
         topBar.BackgroundColor3 = Theme.TopBar
         topBar.BorderSizePixel = 0
         topBar.Parent = mainFrm
         
+        local logoBtn = Instance.new("TextLabel")
+        logoBtn.Size = UDim2.new(0, 45, 0, 45)
+        logoBtn.Position = UDim2.new(0, 0, 0, 0)
+        logoBtn.BackgroundTransparency = 1
+        logoBtn.Text = "N"
+        logoBtn.Font = Enum.Font.GothamBlack
+        logoBtn.TextSize = 22
+        logoBtn.TextColor3 = Theme.Accent
+        logoBtn.Parent = topBar
+        
         local titleLbl = Instance.new("TextLabel")
-        titleLbl.Size = UDim2.new(1, -120, 1, 0)
-        titleLbl.Position = UDim2.new(0, 20, 0, 0)
+        titleLbl.Size = UDim2.new(1, -150, 1, 0)
+        titleLbl.Position = UDim2.new(0, 40, 0, 0)
         titleLbl.BackgroundTransparency = 1
         titleLbl.Text = titleText
         titleLbl.TextColor3 = Theme.TextMain
@@ -93,20 +108,12 @@ return function(Theme)
         titleLbl.TextSize = 15
         titleLbl.Parent = topBar
         
-        local separator = Instance.new("Frame")
-        separator.Size = UDim2.new(1, 0, 0, 1)
-        separator.Position = UDim2.new(0, 0, 1, -1)
-        separator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        separator.BackgroundTransparency = 0.92
-        separator.BorderSizePixel = 0
-        separator.Parent = topBar
-        
         -- ==========================================
-        -- WINDOW CONTROLS (Min, Max, Close)
+        -- macOS STYLE WINDOW CONTROLS
         -- ==========================================
         local ctrlContainer = Instance.new("Frame")
-        ctrlContainer.Size = UDim2.new(0, 90, 1, 0)
-        ctrlContainer.Position = UDim2.new(1, -95, 0, 0)
+        ctrlContainer.Size = UDim2.new(0, 100, 1, 0)
+        ctrlContainer.Position = UDim2.new(1, -105, 0, 0)
         ctrlContainer.BackgroundTransparency = 1
         ctrlContainer.Parent = topBar
         
@@ -117,74 +124,153 @@ return function(Theme)
         ctrlLayout.Padding = UDim.new(0, 8)
         ctrlLayout.Parent = ctrlContainer
         
-        local function createCtrlBtn(txt, hoverColor)
+        local function createMacBtn(color, iconText)
             local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(0, 24, 0, 24)
-            btn.BackgroundColor3 = Theme.Background
-            btn.Text = txt
-            btn.TextColor3 = Theme.TextDim
-            btn.Font = Enum.Font.GothamBold
-            btn.TextSize = 12
+            btn.Size = UDim2.new(0, 14, 0, 14)
+            btn.BackgroundColor3 = color
+            btn.Text = ""
             btn.AutoButtonColor = false
             
             local corner = Instance.new("UICorner")
             corner.CornerRadius = UDim.new(1, 0)
             corner.Parent = btn
             
+            local icon = Instance.new("TextLabel")
+            icon.Size = UDim2.new(1, 0, 1, 0)
+            icon.BackgroundTransparency = 1
+            icon.Text = iconText
+            icon.TextColor3 = Color3.fromRGB(50, 50, 50)
+            icon.TextTransparency = 1
+            icon.Font = Enum.Font.GothamBold
+            icon.TextSize = 10
+            icon.Parent = btn
+            
             btn.MouseEnter:Connect(function()
-                tweenSvc:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor, TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                tweenSvc:Create(icon, TweenInfo.new(0.2), {TextTransparency = 0.3}):Play()
             end)
             btn.MouseLeave:Connect(function()
-                tweenSvc:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Background, TextColor3 = Theme.TextDim}):Play()
+                tweenSvc:Create(icon, TweenInfo.new(0.2), {TextTransparency = 1}):Play()
             end)
+            
             return btn
         end
         
-        local minBtn = createCtrlBtn("-", Color3.fromRGB(200, 150, 50))
-        local maxBtn = createCtrlBtn("□", Color3.fromRGB(50, 200, 100))
-        local closeBtn = createCtrlBtn("X", Color3.fromRGB(220, 50, 50))
+        local minBtn = createMacBtn(Color3.fromRGB(255, 189, 46), "−")
+        local maxBtn = createMacBtn(Color3.fromRGB(39, 201, 63), "＋")
+        local closeBtn = createMacBtn(Color3.fromRGB(255, 95, 86), "✕")
+        
+        minBtn.LayoutOrder = 1
+        maxBtn.LayoutOrder = 2
+        closeBtn.LayoutOrder = 3
         
         minBtn.Parent = ctrlContainer
         maxBtn.Parent = ctrlContainer
         closeBtn.Parent = ctrlContainer
         
-        local isMinimized = false
-        local isMaximized = false
-        local oldSize = UDim2.new(0, 550, 0, 380)
-        local oldPos = UDim2.new(0.5, -275, 0.5, -190)
+        -- ==========================================
+        -- MINIMIZED LOGO "N"
+        -- ==========================================
+        local minLogo = Instance.new("TextButton")
+        minLogo.Size = UDim2.new(0, 50, 0, 50)
+        minLogo.AnchorPoint = Vector2.new(0.5, 0.5)
+        minLogo.BackgroundColor3 = Theme.Background
+        minLogo.Text = "N"
+        minLogo.Font = Enum.Font.GothamBlack
+        minLogo.TextSize = 25
+        minLogo.TextColor3 = Theme.Accent
+        minLogo.Visible = false
+        minLogo.AutoButtonColor = false
+        minLogo.Parent = screenGui
         
+        local minLogoCorner = Instance.new("UICorner")
+        minLogoCorner.CornerRadius = UDim.new(1, 0)
+        minLogoCorner.Parent = minLogo
+        
+        local minLogoStroke = Instance.new("UIStroke")
+        minLogoStroke.Color = Theme.Accent
+        minLogoStroke.Thickness = 2
+        minLogoStroke.Parent = minLogo
+        
+        local minLogoScale = Instance.new("UIScale")
+        minLogoScale.Scale = 0
+        minLogoScale.Parent = minLogo
+        
+        local oldSize = UDim2.new(0, 550, 0, 380)
+        local oldPos = UDim2.new(0.5, 0, 0.5, 0)
+        
+        -- ==========================================
+        -- LOGIKA WINDOW CONTROLS
+        -- ==========================================
         minBtn.MouseButton1Click:Connect(function()
-            isMinimized = not isMinimized
-            if isMinimized then
-                tweenSvc:Create(mainFrm, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0, mainFrm.Size.X.Offset, 0, 45)}):Play()
-            else
-                local targetSize = isMaximized and UDim2.new(1, 0, 1, 0) or oldSize
-                tweenSvc:Create(mainFrm, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = targetSize}):Play()
-            end
+            if winObj.IsMinimized then return end
+            winObj.IsMinimized = true
+            
+            -- Smart Minimize: Ensure minLogo never spawns off-screen
+            local viewport = workspace.CurrentCamera.ViewportSize
+            local halfSize = 25 -- minLogo size is 50x50 with AnchorPoint 0.5, 0.5
+            local centerX = mainFrm.AbsolutePosition.X + (mainFrm.AbsoluteSize.X / 2)
+            local centerY = mainFrm.AbsolutePosition.Y + (mainFrm.AbsoluteSize.Y / 2)
+            
+            local safeX = math.clamp(centerX, halfSize, viewport.X - halfSize)
+            local safeY = math.clamp(centerY, halfSize, viewport.Y - halfSize)
+            
+            minLogo.Position = UDim2.new(0, safeX, 0, safeY)
+            minLogo.Visible = true
+            
+            tweenSvc:Create(uiScale, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = 0}):Play()
+            task.wait(0.2)
+            tweenSvc:Create(minLogoScale, TweenInfo.new(0.5, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Scale = 1}):Play()
+            task.wait(0.2)
+            mainFrm.Visible = false
         end)
         
+        local function unminimize()
+            local targetSize = winObj.IsMaximized and UDim2.new(1, 0, 1, 0) or oldSize
+            local viewport = workspace.CurrentCamera.ViewportSize
+            
+            local halfWidth = targetSize.X.Offset / 2
+            if targetSize.X.Scale == 1 then halfWidth = viewport.X / 2 end
+            local halfHeight = targetSize.Y.Offset / 2
+            if targetSize.Y.Scale == 1 then halfHeight = viewport.Y / 2 end
+            
+            local safeX = math.clamp(minLogo.AbsolutePosition.X + (minLogo.AbsoluteSize.X / 2), halfWidth, viewport.X - halfWidth)
+            local safeY = math.clamp(minLogo.AbsolutePosition.Y + (minLogo.AbsoluteSize.Y / 2), halfHeight, viewport.Y - halfHeight)
+            
+            mainFrm.Position = UDim2.new(0, safeX, 0, safeY)
+            mainFrm.Visible = true
+            
+            tweenSvc:Create(minLogoScale, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = 0}):Play()
+            task.wait(0.15)
+            tweenSvc:Create(uiScale, TweenInfo.new(0.5, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Scale = 1}):Play()
+            task.wait(0.15)
+            minLogo.Visible = false
+            winObj.IsMinimized = false
+        end
+        
         maxBtn.MouseButton1Click:Connect(function()
-            if isMinimized then return end
-            isMaximized = not isMaximized
-            if isMaximized then
+            if winObj.IsMinimized then return end
+            winObj.IsMaximized = not winObj.IsMaximized
+            if winObj.IsMaximized then
                 oldPos = mainFrm.Position
-                tweenSvc:Create(mainFrm, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                tweenSvc:Create(mainFrm, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
                     Size = UDim2.new(1, 0, 1, 0),
-                    Position = UDim2.new(0, 0, 0, 0)
+                    Position = UDim2.new(0.5, 0, 0.5, 0)
                 }):Play()
-                mainCorner.CornerRadius = UDim.new(0, 0)
+                tweenSvc:Create(mainCorner, TweenInfo.new(0.3), {CornerRadius = UDim.new(0, 0)}):Play()
             else
-                tweenSvc:Create(mainFrm, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                tweenSvc:Create(mainFrm, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
                     Size = oldSize,
                     Position = oldPos
                 }):Play()
-                mainCorner.CornerRadius = Theme.CornerRadius
+                tweenSvc:Create(mainCorner, TweenInfo.new(0.3), {CornerRadius = Theme.CornerRadius}):Play()
             end
+            -- Broadcast event to tabs for Grid updates
+            winObj.MaximizeEvent:Fire(winObj.IsMaximized)
         end)
         
         closeBtn.MouseButton1Click:Connect(function()
-            tweenSvc:Create(mainFrm, TweenInfo.new(0.3), {Size = UDim2.new(0, 550, 0, 0), Position = UDim2.new(0.5, -275, 0.5, 0)}):Play()
-            task.wait(0.3)
+            tweenSvc:Create(uiScale, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = 0}):Play()
+            task.wait(0.4)
             screenGui:Destroy()
         end)
 
@@ -209,57 +295,94 @@ return function(Theme)
         tabPadding.PaddingRight = UDim.new(0, 12)
         tabPadding.Parent = tabContainer
         
-        local vSeparator = Instance.new("Frame")
-        vSeparator.Size = UDim2.new(0, 1, 1, -45)
-        vSeparator.Position = UDim2.new(0, 150, 0, 45)
-        vSeparator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        vSeparator.BackgroundTransparency = 0.92
-        vSeparator.BorderSizePixel = 0
-        vSeparator.Parent = mainFrm
-        
         local contentContainer = Instance.new("Frame")
-        contentContainer.Size = UDim2.new(1, -151, 1, -45)
-        contentContainer.Position = UDim2.new(0, 151, 0, 45)
+        contentContainer.Size = UDim2.new(1, -150, 1, -45)
+        contentContainer.Position = UDim2.new(0, 150, 0, 45)
         contentContainer.BackgroundTransparency = 1
         contentContainer.Parent = mainFrm
         
         -- ==========================================
-        -- DRAG SYSTEM
+        -- BUG FREE DRAG SYSTEM (MAIN FRAME)
         -- ==========================================
-        local dragging, dragInput, dragStart, startPos
-        local function update(input)
-            if isMaximized then return end
-            local delta = input.Position - dragStart
-            mainFrm.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-            oldPos = mainFrm.Position
-        end
+        local dragging = false
+        local dragStart, startPos
         
         topBar.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = true
                 dragStart = input.Position
                 startPos = mainFrm.Position
-                input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then dragging = false end
-                end)
             end
         end)
         
-        topBar.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-                dragInput = input
+        topBar.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                dragging = false
             end
         end)
         
         uis.InputChanged:Connect(function(input)
-            if input == dragInput and dragging then update(input) end
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                if dragging and not winObj.IsMaximized then
+                    local delta = input.Position - dragStart
+                    mainFrm.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+                end
+            end
         end)
         
         -- ==========================================
-        -- JALANKAN ANIMASI INTRO & MUNCUL
+        -- BUG FREE DRAG SYSTEM (MINIMIZED LOGO)
+        -- ==========================================
+        local minDragging = false
+        local minHasDragged = false
+        local minDragStart, minStartPos
+        
+        minLogo.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                minDragging = true
+                minHasDragged = false
+                minDragStart = input.Position
+                minStartPos = minLogo.Position
+            end
+        end)
+        
+        minLogo.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                minDragging = false
+            end
+        end)
+        
+        uis.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                if minDragging and minDragStart then
+                    local delta = input.Position - minDragStart
+                    if delta.Magnitude > 5 then
+                        minHasDragged = true
+                        
+                        local viewport = workspace.CurrentCamera.ViewportSize
+                        local halfSize = 25
+                        local rawX = minStartPos.X.Offset + delta.X
+                        local rawY = minStartPos.Y.Offset + delta.Y
+                        
+                        local safeX = math.clamp(rawX, halfSize, viewport.X - halfSize)
+                        local safeY = math.clamp(rawY, halfSize, viewport.Y - halfSize)
+                        
+                        minLogo.Position = UDim2.new(0, safeX, 0, safeY)
+                    end
+                end
+            end
+        end)
+        
+        minLogo.MouseButton1Click:Connect(function()
+            if not minHasDragged then
+                unminimize()
+            end
+        end)
+        
+        -- ==========================================
+        -- JALANKAN ANIMASI INTRO
         -- ==========================================
         task.spawn(function()
-            -- 1. Animasi Slide Up + Elastic Membesar (Bounce)
             tweenSvc:Create(introText, TweenInfo.new(1.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {
                 Position = UDim2.new(0, 0, 0.5, -40),
                 TextSize = 75,
@@ -274,7 +397,6 @@ return function(Theme)
             
             task.wait(1.5)
             
-            -- 2. Pulse / Berkedip berubah warna
             tweenSvc:Create(introText, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
                 TextColor3 = Theme.Accent,
                 TextSize = 85
@@ -286,7 +408,6 @@ return function(Theme)
             
             task.wait(0.4)
             
-            -- 3. Mengecil tajam (Back) dan menghilang ke atas
             tweenSvc:Create(introText, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
                 Position = UDim2.new(0, 0, 0.4, -100),
                 TextSize = 0,
@@ -301,9 +422,8 @@ return function(Theme)
             task.wait(0.7)
             introBg:Destroy()
             
-            -- 4. Luncurkan UI Utama dari bawah ke tengah
             tweenSvc:Create(mainFrm, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                Position = UDim2.new(0.5, -275, 0.5, -190)
+                Position = UDim2.new(0.5, 0, 0.5, 0)
             }):Play()
         end)
         

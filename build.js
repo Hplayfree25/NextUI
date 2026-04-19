@@ -72,33 +72,43 @@ function UILib:Init(title)
 end
 
 -- =======================================================
--- EKSEKUSI TEMPLATE (BAGIAN BAWAH INI ADALAH TESTING)
+-- EKSEKUSI TEMPLATE (TESTING DYNAMIC GRID)
 -- =======================================================
 
-local myUI = UILib:Init("SVFG NextUI")
+local myUI = UILib:Init("NextUI")
 
 local mainTab = myUI:AddTab("Main")
 
-mainTab:AddButton("Test Button", function()
-    print("Button Clicked!")
-end)
-
-mainTab:AddToggle("Auto Farm", false, function(state)
+mainTab:AddToggle("Auto Farm Mobs", false, function(state)
     print("Toggle State:", state)
 end)
 
-mainTab:AddSlider("WalkSpeed", 16, 100, 16, function(value)
+mainTab:AddSlider("WalkSpeed Mod", 16, 100, 16, function(value)
     if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
     end
 end)
 
+mainTab:AddDropdown("Select Weapon", {"Sword", "Bow", "Magic"}, function(selected)
+    print("Selected:", selected)
+end)
+
+-- Simulasi Banyak Tombol untuk melihat efek 2-Grid saat Fullscreen
+for i = 1, 10 do
+    mainTab:AddButton("Simulated Button " .. i, function()
+        print("Clicked Button " .. i)
+    end)
+end
+
 local settingsTab = myUI:AddTab("Settings")
 
-settingsTab:AddDropdown("Select Target", {"Player 1", "Player 2", "Player 3"}, function(selected)
-    print("Selected:", selected)
+settingsTab:AddToggle("Anti Lag Mode", true, function(state)
+    print("Anti lag:", state)
+end)
+settingsTab:AddButton("Destroy UI", function()
+    print("UI Destroyed")
 end)
 `;
 
 fs.writeFileSync(path.join(__dirname, 'template.lua'), output);
-console.log('Build successful! template.lua updated.');
+console.log('Build successful! template.lua updated with dynamic grid system.');
