@@ -25,45 +25,48 @@ return function(Theme)
         screenGui.Parent = guiParent
         
         -- ==========================================
-        -- INTRO CINEMATIC SEQUENCE (DIPERBAIKI)
+        -- INTRO CINEMATIC SEQUENCE (NO BACKGROUND, MODERN)
         -- ==========================================
         local introBg = Instance.new("Frame")
         introBg.Size = UDim2.new(1, 0, 1, 0)
         introBg.Position = UDim2.new(0, 0, 0, 0)
-        introBg.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
+        introBg.BackgroundTransparency = 1 -- Transparan 100%
         introBg.BorderSizePixel = 0
         introBg.ZIndex = 100
         introBg.Parent = screenGui
         
+        -- Teks utama
         local introText = Instance.new("TextLabel")
-        introText.Size = UDim2.new(1, 0, 0, 60)
-        introText.Position = UDim2.new(0, 0, 0.5, -45)
+        introText.Size = UDim2.new(1, 0, 0, 80)
+        introText.Position = UDim2.new(0, 0, 0.6, 0) -- Mulai dari bawah
         introText.BackgroundTransparency = 1
-        introText.Text = "SVFG"
+        introText.Text = "NextUI"
         introText.Font = Enum.Font.GothamBlack
-        introText.TextSize = 48
+        introText.TextSize = 5 -- Mulai sangat kecil
         introText.TextColor3 = Color3.fromRGB(255, 255, 255)
-        introText.ZIndex = 101
+        introText.TextTransparency = 1 -- Transparan
+        introText.ZIndex = 102
         introText.Parent = introBg
         
-        local introSubText = Instance.new("TextLabel")
-        introSubText.Size = UDim2.new(1, 0, 0, 30)
-        introSubText.Position = UDim2.new(0, 0, 0.5, 15)
-        introSubText.BackgroundTransparency = 1
-        introSubText.Text = "NextUI"
-        introSubText.Font = Enum.Font.GothamMedium
-        introSubText.TextSize = 24
-        introSubText.TextColor3 = Theme.Accent
-        introSubText.ZIndex = 101
-        introSubText.Parent = introBg
+        -- Teks bayangan (Glow effect)
+        local glowText = Instance.new("TextLabel")
+        glowText.Size = UDim2.new(1, 0, 0, 80)
+        glowText.Position = UDim2.new(0, 0, 0.6, 0)
+        glowText.BackgroundTransparency = 1
+        glowText.Text = "NextUI"
+        glowText.Font = Enum.Font.GothamBlack
+        glowText.TextSize = 5
+        glowText.TextColor3 = Theme.Accent -- Warna Blurple
+        glowText.TextTransparency = 1
+        glowText.ZIndex = 101
+        glowText.Parent = introBg
         
         -- ==========================================
         -- MAIN WINDOW
         -- ==========================================
-        -- Menggunakan Frame standar agar tidak buggy di executor
         local mainFrm = Instance.new("Frame")
         mainFrm.Size = UDim2.new(0, 550, 0, 380)
-        mainFrm.Position = UDim2.new(0.5, -275, 1, 100) -- Mulai dari bawah layar
+        mainFrm.Position = UDim2.new(0.5, -275, 1, 100) -- Mulai dari luar bawah layar
         mainFrm.BackgroundColor3 = Theme.Background
         mainFrm.BorderSizePixel = 0
         mainFrm.ClipsDescendants = true
@@ -125,7 +128,7 @@ return function(Theme)
             btn.AutoButtonColor = false
             
             local corner = Instance.new("UICorner")
-            corner.CornerRadius = UDim.new(1, 0) -- Bulat sempurna
+            corner.CornerRadius = UDim.new(1, 0)
             corner.Parent = btn
             
             btn.MouseEnter:Connect(function()
@@ -256,25 +259,52 @@ return function(Theme)
         -- JALANKAN ANIMASI INTRO & MUNCUL
         -- ==========================================
         task.spawn(function()
-            -- Efek intro teks
-            tweenSvc:Create(introText, TweenInfo.new(1.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {TextSize = 55}):Play()
+            -- 1. Animasi Slide Up + Elastic Membesar (Bounce)
+            tweenSvc:Create(introText, TweenInfo.new(1.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {
+                Position = UDim2.new(0, 0, 0.5, -40),
+                TextSize = 75,
+                TextTransparency = 0
+            }):Play()
+            
+            tweenSvc:Create(glowText, TweenInfo.new(1.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {
+                Position = UDim2.new(0, 0, 0.5, -40),
+                TextSize = 80,
+                TextTransparency = 0.6
+            }):Play()
+            
             task.wait(1.5)
             
-            -- Hilangkan teks intro dengan Tween
-            tweenSvc:Create(introText, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
-            tweenSvc:Create(introSubText, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
-            task.wait(0.5)
+            -- 2. Pulse / Berkedip berubah warna
+            tweenSvc:Create(introText, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+                TextColor3 = Theme.Accent,
+                TextSize = 85
+            }):Play()
+            tweenSvc:Create(glowText, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+                TextSize = 95,
+                TextTransparency = 0.8
+            }):Play()
             
-            -- Hilangkan background intro (Hitam)
-            tweenSvc:Create(introBg, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
+            task.wait(0.4)
             
-            -- Luncurkan UI Utama dari bawah ke tengah
+            -- 3. Mengecil tajam (Back) dan menghilang ke atas
+            tweenSvc:Create(introText, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+                Position = UDim2.new(0, 0, 0.4, -100),
+                TextSize = 0,
+                TextTransparency = 1
+            }):Play()
+            tweenSvc:Create(glowText, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+                Position = UDim2.new(0, 0, 0.4, -100),
+                TextSize = 0,
+                TextTransparency = 1
+            }):Play()
+            
+            task.wait(0.7)
+            introBg:Destroy()
+            
+            -- 4. Luncurkan UI Utama dari bawah ke tengah
             tweenSvc:Create(mainFrm, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                 Position = UDim2.new(0.5, -275, 0.5, -190)
             }):Play()
-            
-            task.wait(0.6)
-            introBg:Destroy()
         end)
         
         winObj.Container = contentContainer
