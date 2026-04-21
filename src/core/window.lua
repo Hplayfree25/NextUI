@@ -3,7 +3,13 @@ local uis = game:GetService("UserInputService")
 return function(Theme)
     local WindowLib = {}
     function WindowLib:Create(titleText)
-        local winObj = {IsMaximized = false, IsMinimized = false, MaximizeEvent = Instance.new("BindableEvent")}
+        local winObj = {
+            IsMaximized = false, 
+            IsMinimized = false, 
+            MaximizeEvent = Instance.new("BindableEvent"),
+            OnAuthSuccess = Instance.new("BindableEvent"),
+            MemberClass = "Unverified"
+        }
         local guiParent = game:GetService("CoreGui")
         if not pcall(function() local _ = guiParent.Name end) then
             guiParent = game.Players.LocalPlayer:WaitForChild("PlayerGui")

@@ -14,5 +14,11 @@ return function(Theme)
         lbl.TextSize = 13
         lbl.Parent = lblFrm
         tabObj:AddElement(lblFrm)
+        
+        local publicLbl = {}
+        function publicLbl:SetText(newText)
+            lbl.Text = newText
+        end
+        return publicLbl
     end
 end

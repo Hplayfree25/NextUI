@@ -14,6 +14,10 @@ local WindowConstructor = (function()
 ${readFile('core/window.lua')}
 end)()
 
+local AuthConstructor = (function()
+${readFile('core/auth.lua')}
+end)()
+
 local TabConstructor = (function()
 ${readFile('core/tab.lua')}
 end)()
@@ -46,21 +50,34 @@ local MultiDropdownConstructor = (function()
 ${readFile('components/multidropdown.lua')}
 end)()
 
-function UILib:Init(title, scriptAuthor, version)
+function UILib:Init(config)
+    if type(config) == "string" then
+        config = {Title = config}
+    end
+
     Theme:Load()
     local WindowLib = WindowConstructor(Theme)
+    local AuthLib = AuthConstructor(Theme)
     local TabLib = TabConstructor(Theme)
-    local win = WindowLib:Create(title)
+
+    local win = WindowLib:Create(config.Title or "NextUI")
+
+    if config.KeySystem then
+        AuthLib:Create(win, config)
+    else
+        win:PlayIntro()
+    end
+
     local publicWin = {}
-    
+
     function publicWin:AddTab(name)
         local tab = TabLib:Create(win, name)
         local publicTab = {}
-        
+
         function publicTab:AddSection(secTitle)
             local sec = SectionConstructor(Theme)(tab, secTitle)
             local publicSec = {}
-            
+
             function publicSec:AddLabel(text)
                 LabelConstructor(Theme)(sec, text)
             end
@@ -79,19 +96,26 @@ function UILib:Init(title, scriptAuthor, version)
             function publicSec:AddMultiDropdown(text, options, defaultSelected, callback)
                 MultiDropdownConstructor(Theme)(sec, text, options, defaultSelected, callback)
             end
-            
+
             return publicSec
         end
         return publicTab
     end
-    
+
     local function buildCreditsTab()
         local sTab = publicWin:AddTab("Credits")
         local infoSec = sTab:AddSection("Information")
-        infoSec:AddLabel("Script Author: " .. tostring(scriptAuthor or "Unknown"))
-        infoSec:AddLabel("Script Version: " .. tostring(version or "1.0.0"))
+        infoSec:AddLabel("Script Author: " .. tostring(config.Author or "Unknown"))
+        infoSec:AddLabel("Script Version: " .. tostring(config.Version or "1.0.0"))
         infoSec:AddLabel("UI Library: NextUI by MizaeDev")
-        
+
+        if config.KeySystem then
+            local statusLbl = infoSec:AddLabel("Member Status: Unverified")
+            win.OnAuthSuccess.Event:Connect(function(className)
+                statusLbl:SetText("Member Status: " .. tostring(className))
+            end)
+        end
+
         local themeSec = sTab:AddSection("Theme Settings")
         themeSec:AddDropdown("Theme Preset", {"Dark", "Glass", "Light"}, function(sel)
             Theme:SetTheme(sel)
@@ -106,13 +130,30 @@ function UILib:Init(title, scriptAuthor, version)
             elseif sel == "Orange" then Theme:SetCustom("Accent", Color3.fromRGB(255, 128, 0)) end
         end)
     end
-    
+
     buildCreditsTab()
     return publicWin
-end
+    end
 
-local UI = UILib:Init("Universal Hub", "YourName Here", "V2.1.0")
-
+    local UI = UILib:Init({
+    Title = "Universal Hub",
+    Author = "YourName Here",
+    Version = "V2.1.0",
+    KeySystem = true,
+    KeySettings = {
+        Title = "NextUI Login",
+        Subtitle = "Join discord to get the key",
+        -- Multiple Membership Classes
+        Key = {
+            Free = {"Free123", "TrialKey"},
+            Premium = {"Premium123", "VipKey"},
+            Developer = "Dev123"
+        },
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Discord = "https://discord.gg/"
+    }
+    })
 local mainTab = UI:AddTab("Main")
 local farmSec = mainTab:AddSection("Farming")
 farmSec:AddToggle("Auto Farm Mobs", false, function(state)
@@ -140,6 +181,5 @@ for i = 1, 15 do
     gridSec:AddButton("Test Button " .. i, function()
     end)
 end
-
 `;
 fs.writeFileSync(path.join(__dirname, 'template.lua'), output);
