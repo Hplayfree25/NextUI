@@ -17,7 +17,7 @@ return function(Theme)
             guiParent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
         end
         
-        -- Remove old auth
+        
         for _, gui in pairs(guiParent:GetChildren()) do
             if gui.Name == "Vantix_Auth" then gui:Destroy() end
         end
@@ -37,7 +37,7 @@ return function(Theme)
             pcall(function() savedKey = read_file(keyFileName) end)
         end
         
-        -- UI Elements
+        
         local bgOverlay = Instance.new("Frame")
         bgOverlay.Size = UDim2.new(1, 0, 1, 0)
         bgOverlay.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
@@ -200,7 +200,7 @@ return function(Theme)
             
             isChecking = true
             checkBtn.Text = "Checking..."
-            task.wait(0.6) -- Simulated Loading
+            task.wait(0.6) 
             
             local isValid, className = verifyKey(input)
             
@@ -216,7 +216,7 @@ return function(Theme)
                     winObj.OnAuthSuccess:Fire(className)
                 end
                 
-                -- Close Auth and open Main UI
+                
                 task.wait(0.8)
                 tweenSvc:Create(uiScale, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = 0}):Play()
                 tweenSvc:Create(bgOverlay, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
@@ -243,7 +243,7 @@ return function(Theme)
             end
         end)
         
-        -- Animations
+        
         tweenSvc:Create(uiScale, TweenInfo.new(0.6, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Scale = 1}):Play()
     end
     

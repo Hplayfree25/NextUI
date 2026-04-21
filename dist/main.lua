@@ -1,16 +1,16 @@
--- Universal UI Library Bundled (Glassmorphism & Modern Dark)
+
 local UILib = {}
 
 local Theme = (function()
 local Theme = {
-    Background = Color3.fromRGB(18, 18, 24), -- Slack-like modern dark
+    Background = Color3.fromRGB(18, 18, 24), 
     BackgroundTransparency = 0.02,
     
     TopBar = Color3.fromRGB(24, 24, 32),
     TopBarTransparency = 0,
     
     TabUnselected = Color3.fromRGB(24, 24, 32),
-    TabSelected = Color3.fromRGB(88, 101, 242), -- Blurple / Slack blue
+    TabSelected = Color3.fromRGB(88, 101, 242), 
     
     ElementBg = Color3.fromRGB(28, 28, 38),
     ElementHover = Color3.fromRGB(38, 38, 50),
@@ -21,7 +21,7 @@ local Theme = {
     
     Accent = Color3.fromRGB(88, 101, 242),
     
-    CornerRadius = UDim.new(0, 8) -- Lebih membulat
+    CornerRadius = UDim.new(0, 8) 
 }
 
 return Theme
@@ -42,7 +42,7 @@ return function(Theme)
             guiParent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
         end
         
-        -- Hapus GUI lama jika ada (Auto-Refresh)
+        
         for _, gui in pairs(guiParent:GetChildren()) do
             if gui.Name == "NextUI_Universal" then
                 gui:Destroy()
@@ -55,9 +55,9 @@ return function(Theme)
         screenGui.IgnoreGuiInset = true
         screenGui.Parent = guiParent
         
-        -- ==========================================
-        -- INTRO CINEMATIC SEQUENCE
-        -- ==========================================
+        
+        
+        
         local introBg = Instance.new("Frame")
         introBg.Size = UDim2.new(1, 0, 1, 0)
         introBg.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
@@ -97,16 +97,16 @@ return function(Theme)
         introSubText.TextTransparency = 1
         introSubText.Parent = introContainer
         
-        -- ==========================================
-        -- MAIN WINDOW (CANVAS GROUP UNTUK FADE)
-        -- ==========================================
+        
+        
+        
         local mainFrm = Instance.new("CanvasGroup")
         mainFrm.Size = UDim2.new(0, 550, 0, 380)
-        mainFrm.Position = UDim2.new(0.5, -275, 0.5, -170) -- Mulai agak ke bawah
+        mainFrm.Position = UDim2.new(0.5, -275, 0.5, -170) 
         mainFrm.BackgroundColor3 = Theme.Background
         mainFrm.BackgroundTransparency = Theme.BackgroundTransparency
         mainFrm.BorderSizePixel = 0
-        mainFrm.GroupTransparency = 1 -- Sembunyikan awal
+        mainFrm.GroupTransparency = 1 
         mainFrm.Parent = screenGui
         
         local corner = Instance.new("UICorner")
@@ -157,7 +157,7 @@ return function(Theme)
         tabPadding.PaddingRight = UDim.new(0, 12)
         tabPadding.Parent = tabContainer
         
-        -- Garis vertikal tab
+        
         local vSeparator = Instance.new("Frame")
         vSeparator.Size = UDim2.new(0, 1, 1, -45)
         vSeparator.Position = UDim2.new(0, 150, 0, 45)
@@ -172,7 +172,7 @@ return function(Theme)
         contentContainer.BackgroundTransparency = 1
         contentContainer.Parent = mainFrm
         
-        -- Sistem Drag
+        
         local dragging, dragInput, dragStart, startPos
         local function update(input)
             local delta = input.Position - dragStart
@@ -200,28 +200,28 @@ return function(Theme)
             if input == dragInput and dragging then update(input) end
         end)
         
-        -- JALANKAN ANIMASI INTRO
+        
         task.spawn(function()
-            -- 1. Fade In SVFG & Scale
+            
             tweenSvc:Create(introText, TweenInfo.new(0.8, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
             tweenSvc:Create(introText, TweenInfo.new(2.5, Enum.EasingStyle.Linear), {TextSize = 48}):Play()
             task.wait(0.6)
             
-            -- 2. Fade In NextUI
+            
             tweenSvc:Create(introSubText, TweenInfo.new(0.6, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
             task.wait(1.5)
             
-            -- 3. Fade Out Text
+            
             tweenSvc:Create(introText, TweenInfo.new(0.5), {TextTransparency = 1, TextSize = 52}):Play()
             tweenSvc:Create(introSubText, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
             task.wait(0.3)
             
-            -- 4. Fade Out Bg
+            
             tweenSvc:Create(introBg, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
             task.wait(0.5)
             introBg:Destroy()
             
-            -- 5. Animasi Main UI Muncul (Fade + Slide Up)
+            
             tweenSvc:Create(mainFrm, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                 GroupTransparency = 0,
                 Position = UDim2.new(0.5, -275, 0.5, -190)
@@ -394,7 +394,7 @@ return function(Theme)
         lbl.TextSize = 13
         lbl.Parent = toggleFrm
         
-        -- Background indikator (ala iOS/Slack toggle)
+        
         local indicatorBg = Instance.new("Frame")
         indicatorBg.Size = UDim2.new(0, 42, 0, 22)
         indicatorBg.Position = UDim2.new(1, -55, 0.5, -11)
@@ -492,7 +492,7 @@ return function(Theme)
         fillCorner.CornerRadius = UDim.new(1, 0)
         fillCorner.Parent = sliderFill
         
-        -- Slider thumb (lingkaran putih ala modern UI)
+        
         local thumb = Instance.new("Frame")
         thumb.Size = UDim2.new(0, 14, 0, 14)
         thumb.Position = UDim2.new(1, -7, 0.5, -7)
@@ -505,7 +505,7 @@ return function(Theme)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(1, 0, 1, 0)
         btn.Position = UDim2.new(0, 0, -1, 0)
-        btn.Size = UDim2.new(1, 0, 3, 0) -- Lebih besar agar mudah disentuh
+        btn.Size = UDim2.new(1, 0, 3, 0) 
         btn.BackgroundTransparency = 1
         btn.Text = ""
         btn.Parent = sliderBg

@@ -140,10 +140,9 @@ function UILib:Init(config)
     Author = "YourName Here",
     Version = "V2.1.0",
     KeySystem = true,
-    KeySettings = {
+        KeySettings = {
         Title = "Vantix Login",
         Subtitle = "Join discord to get the key",
-        -- Multiple Membership Classes
         Key = {
             Free = {"Free123", "TrialKey"},
             Premium = {"Premium123", "VipKey"},
@@ -151,7 +150,7 @@ function UILib:Init(config)
         },
         SaveKey = true,
         GrabKeyFromSite = false,
-        Discord = "https://discord.gg/"
+        Discord = "https:
     }
     })
 local mainTab = UI:AddTab("Main")
