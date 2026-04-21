@@ -15,6 +15,7 @@ return function(Theme)
         screenGui.Name = "NextUI_Universal"
         screenGui.ResetOnSpawn = false
         screenGui.IgnoreGuiInset = true
+        screenGui.Enabled = false
         screenGui.Parent = guiParent
         local introBg = Instance.new("Frame")
         introBg.Size = UDim2.new(1, 0, 1, 0)
@@ -50,7 +51,7 @@ return function(Theme)
         mainFrm.Position = UDim2.new(0.5, 0, 1.5, 0)
         Theme:Apply(mainFrm, {BackgroundColor3 = "Background", BackgroundTransparency = "BackgroundTransparency"})
         mainFrm.BorderSizePixel = 0
-        mainFrm.ClipsDescendants = true
+        mainFrm.ClipsDescendants = false
         mainFrm.Parent = screenGui
         local mainCorner = Instance.new("UICorner")
         Theme:Apply(mainCorner, {CornerRadius = "CornerRadius"})
@@ -63,6 +64,15 @@ return function(Theme)
         Theme:Apply(topBar, {BackgroundColor3 = "TopBar", BackgroundTransparency = "TopBarTransparency"})
         topBar.BorderSizePixel = 0
         topBar.Parent = mainFrm
+        local topBarCorner = Instance.new("UICorner")
+        Theme:Apply(topBarCorner, {CornerRadius = "CornerRadius"})
+        topBarCorner.Parent = topBar
+        local topBarPatch = Instance.new("Frame")
+        topBarPatch.Size = UDim2.new(1, 0, 0, 10)
+        topBarPatch.Position = UDim2.new(0, 0, 1, -10)
+        Theme:Apply(topBarPatch, {BackgroundColor3 = "TopBar", BackgroundTransparency = "TopBarTransparency"})
+        topBarPatch.BorderSizePixel = 0
+        topBarPatch.Parent = topBar
         local logoBtn = Instance.new("TextLabel")
         logoBtn.Size = UDim2.new(0, 45, 0, 45)
         logoBtn.BackgroundTransparency = 1
@@ -187,9 +197,13 @@ return function(Theme)
                 oldPos = mainFrm.Position
                 tweenSvc:Create(mainFrm, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 1, 0), Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
                 tweenSvc:Create(mainCorner, TweenInfo.new(0.3), {CornerRadius = UDim.new(0, 0)}):Play()
+                tweenSvc:Create(topBarCorner, TweenInfo.new(0.3), {CornerRadius = UDim.new(0, 0)}):Play()
+                topBarPatch.Visible = false
             else
                 tweenSvc:Create(mainFrm, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = oldSize, Position = oldPos}):Play()
                 tweenSvc:Create(mainCorner, TweenInfo.new(0.3), {CornerRadius = Theme.Current.CornerRadius}):Play()
+                tweenSvc:Create(topBarCorner, TweenInfo.new(0.3), {CornerRadius = Theme.Current.CornerRadius}):Play()
+                topBarPatch.Visible = true
             end
             winObj.MaximizeEvent:Fire(winObj.IsMaximized)
         end)
@@ -208,10 +222,6 @@ return function(Theme)
         tabListLayout.Padding = UDim.new(0, 8)
         tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
         tabListLayout.Parent = tabContainer
-        
-        tabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            tabContainer.CanvasSize = UDim2.new(0, 0, 0, tabListLayout.AbsoluteContentSize.Y + 30)
-        end)
         local tabPadding = Instance.new("UIPadding")
         tabPadding.PaddingTop = UDim.new(0, 15)
         tabPadding.PaddingLeft = UDim.new(0, 12)
@@ -280,19 +290,22 @@ return function(Theme)
         minLogo.MouseButton1Click:Connect(function()
             if not minHasDragged then unminimize() end
         end)
-        task.spawn(function()
-            tweenSvc:Create(introText, TweenInfo.new(1.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0.5, -40), TextSize = 75, TextTransparency = 0}):Play()
-            tweenSvc:Create(glowText, TweenInfo.new(1.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0.5, -40), TextSize = 80, TextTransparency = 0.6}):Play()
-            task.wait(1.5)
-            tweenSvc:Create(introText, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextColor3 = Theme.Current.Accent, TextSize = 85}):Play()
-            tweenSvc:Create(glowText, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextSize = 95, TextTransparency = 0.8}):Play()
-            task.wait(0.4)
-            tweenSvc:Create(introText, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 0.4, -100), TextSize = 0, TextTransparency = 1}):Play()
-            tweenSvc:Create(glowText, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 0.4, -100), TextSize = 0, TextTransparency = 1}):Play()
-            task.wait(0.7)
-            introBg:Destroy()
-            tweenSvc:Create(mainFrm, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
-        end)
+        function winObj:PlayIntro()
+            screenGui.Enabled = true
+            task.spawn(function()
+                tweenSvc:Create(introText, TweenInfo.new(1.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0.5, -40), TextSize = 75, TextTransparency = 0}):Play()
+                tweenSvc:Create(glowText, TweenInfo.new(1.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0.5, -40), TextSize = 80, TextTransparency = 0.6}):Play()
+                task.wait(1.5)
+                tweenSvc:Create(introText, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextColor3 = Theme.Current.Accent, TextSize = 85}):Play()
+                tweenSvc:Create(glowText, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextSize = 95, TextTransparency = 0.8}):Play()
+                task.wait(0.4)
+                tweenSvc:Create(introText, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 0.4, -100), TextSize = 0, TextTransparency = 1}):Play()
+                tweenSvc:Create(glowText, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 0.4, -100), TextSize = 0, TextTransparency = 1}):Play()
+                task.wait(0.7)
+                introBg:Destroy()
+                tweenSvc:Create(mainFrm, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+            end)
+        end
         winObj.Container = contentContainer
         winObj.TabContainer = tabContainer
         winObj.ScreenGui = screenGui
