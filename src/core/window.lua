@@ -15,10 +15,10 @@ return function(Theme)
             guiParent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
         end
         for _, gui in pairs(guiParent:GetChildren()) do
-            if gui.Name == "NextUI_Universal" then gui:Destroy() end
+            if gui.Name == "Vantix_Universal" then gui:Destroy() end
         end
         local screenGui = Instance.new("ScreenGui")
-        screenGui.Name = "NextUI_Universal"
+        screenGui.Name = "Vantix_Universal"
         screenGui.ResetOnSpawn = false
         screenGui.IgnoreGuiInset = true
         screenGui.Enabled = false

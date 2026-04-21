@@ -60,7 +60,7 @@ function UILib:Init(config)
     local AuthLib = AuthConstructor(Theme)
     local TabLib = TabConstructor(Theme)
 
-    local win = WindowLib:Create(config.Title or "NextUI")
+    local win = WindowLib:Create(config.Title or "Vantix")
 
     if config.KeySystem then
         AuthLib:Create(win, config)
@@ -79,22 +79,22 @@ function UILib:Init(config)
             local publicSec = {}
 
             function publicSec:AddLabel(text)
-                LabelConstructor(Theme)(sec, text)
+                return LabelConstructor(Theme)(sec, text)
             end
             function publicSec:AddButton(text, callback)
-                ButtonConstructor(Theme)(sec, text, callback)
+                return ButtonConstructor(Theme)(sec, text, callback)
             end
             function publicSec:AddToggle(text, default, callback)
-                ToggleConstructor(Theme)(sec, text, default, callback)
+                return ToggleConstructor(Theme)(sec, text, default, callback)
             end
             function publicSec:AddSlider(text, min, max, default, callback)
-                SliderConstructor(Theme)(sec, text, min, max, default, callback)
+                return SliderConstructor(Theme)(sec, text, min, max, default, callback)
             end
             function publicSec:AddDropdown(text, options, callback)
-                DropdownConstructor(Theme)(sec, text, options, callback)
+                return DropdownConstructor(Theme)(sec, text, options, callback)
             end
             function publicSec:AddMultiDropdown(text, options, defaultSelected, callback)
-                MultiDropdownConstructor(Theme)(sec, text, options, defaultSelected, callback)
+                return MultiDropdownConstructor(Theme)(sec, text, options, defaultSelected, callback)
             end
 
             return publicSec
@@ -107,7 +107,7 @@ function UILib:Init(config)
         local infoSec = sTab:AddSection("Information")
         infoSec:AddLabel("Script Author: " .. tostring(config.Author or "Unknown"))
         infoSec:AddLabel("Script Version: " .. tostring(config.Version or "1.0.0"))
-        infoSec:AddLabel("UI Library: NextUI by MizaeDev")
+        infoSec:AddLabel("UI Library: Vantix by MizaeDev")
 
         if config.KeySystem then
             local statusLbl = infoSec:AddLabel("Member Status: Unverified")
@@ -141,7 +141,7 @@ function UILib:Init(config)
     Version = "V2.1.0",
     KeySystem = true,
     KeySettings = {
-        Title = "NextUI Login",
+        Title = "Vantix Login",
         Subtitle = "Join discord to get the key",
         -- Multiple Membership Classes
         Key = {

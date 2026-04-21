@@ -8,7 +8,7 @@ return function(Theme)
         local keySettings = config.KeySettings or {}
         
         local authGui = Instance.new("ScreenGui")
-        authGui.Name = "NextUI_Auth"
+        authGui.Name = "Vantix_Auth"
         authGui.ResetOnSpawn = false
         authGui.IgnoreGuiInset = true
         
@@ -19,7 +19,7 @@ return function(Theme)
         
         -- Remove old auth
         for _, gui in pairs(guiParent:GetChildren()) do
-            if gui.Name == "NextUI_Auth" then gui:Destroy() end
+            if gui.Name == "Vantix_Auth" then gui:Destroy() end
         end
         authGui.Parent = guiParent
         
@@ -29,7 +29,7 @@ return function(Theme)
         local write_file = env.writefile or (env.getgenv and env.getgenv().writefile)
         local set_clipboard = env.setclipboard or (env.getgenv and env.getgenv().setclipboard)
         
-        local keyFileName = (config.Title or "NextUI") .. "_Key.txt"
+        local keyFileName = (config.Title or "Vantix") .. "_Key.txt"
         keyFileName = string.gsub(keyFileName, " ", "_")
         local savedKey = ""
         
@@ -135,22 +135,6 @@ return function(Theme)
         Theme:Apply(checkCorner, {CornerRadius = "CornerRadius"})
         checkCorner.Parent = checkBtn
         
-        local function checkAnimation(success, msg)
-            local origColor = checkBtn.BackgroundColor3
-            local origText = checkBtn.Text
-            checkBtn.Text = msg
-            if success then
-                tweenSvc:Create(checkBtn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(46, 204, 113)}):Play()
-            else
-                tweenSvc:Create(checkBtn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(231, 76, 60)}):Play()
-            end
-            task.wait(1)
-            if not success then
-                checkBtn.Text = origText
-                tweenSvc:Create(checkBtn, TweenInfo.new(0.3), {BackgroundColor3 = origColor}):Play()
-            end
-        end
-        
         local function verifyKey(inputKey)
             if keySettings.GrabKeyFromSite then
                 if type(keySettings.Key) == "table" then
@@ -194,19 +178,35 @@ return function(Theme)
             end
             return false, "None"
         end
+
+        local isChecking = false
         
         checkBtn.MouseButton1Click:Connect(function()
+            if isChecking then return end
             local input = keyBox.Text
+            local origColor = checkBtn.BackgroundColor3
+            local origText = checkBtn.Text
+            
             if input == "" then
-                checkAnimation(false, "Empty Key!")
+                isChecking = true
+                checkBtn.Text = "Empty Key!"
+                tweenSvc:Create(checkBtn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(231, 76, 60)}):Play()
+                task.wait(1)
+                checkBtn.Text = origText
+                tweenSvc:Create(checkBtn, TweenInfo.new(0.3), {BackgroundColor3 = origColor}):Play()
+                isChecking = false
                 return
             end
             
+            isChecking = true
             checkBtn.Text = "Checking..."
+            task.wait(0.6) -- Simulated Loading
+            
             local isValid, className = verifyKey(input)
             
             if isValid then
-                checkAnimation(true, "Success!")
+                checkBtn.Text = "Verified!"
+                tweenSvc:Create(checkBtn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(46, 204, 113)}):Play()
                 if keySettings.SaveKey and write_file then
                     pcall(function() write_file(keyFileName, input) end)
                 end
@@ -217,14 +217,19 @@ return function(Theme)
                 end
                 
                 -- Close Auth and open Main UI
-                task.wait(0.5)
+                task.wait(0.8)
                 tweenSvc:Create(uiScale, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = 0}):Play()
                 tweenSvc:Create(bgOverlay, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
                 task.wait(0.5)
                 authGui:Destroy()
                 winObj:PlayIntro()
             else
-                checkAnimation(false, "Invalid Key!")
+                checkBtn.Text = "Invalid Key!"
+                tweenSvc:Create(checkBtn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(231, 76, 60)}):Play()
+                task.wait(1.5)
+                checkBtn.Text = origText
+                tweenSvc:Create(checkBtn, TweenInfo.new(0.3), {BackgroundColor3 = origColor}):Play()
+                isChecking = false
             end
         end)
         
