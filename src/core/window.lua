@@ -25,28 +25,29 @@ return function(Theme)
         screenGui.Parent = guiParent
         local introBg = Instance.new("Frame")
         introBg.Size = UDim2.new(1, 0, 1, 0)
-        introBg.BackgroundTransparency = 1
+        introBg.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+        introBg.BackgroundTransparency = 0
         introBg.BorderSizePixel = 0
         introBg.ZIndex = 100
         introBg.Parent = screenGui
         local introText = Instance.new("TextLabel")
         introText.Size = UDim2.new(1, 0, 0, 80)
-        introText.Position = UDim2.new(0, 0, 0.6, 0)
+        introText.Position = UDim2.new(0, 0, 0.5, 20)
         introText.BackgroundTransparency = 1
-        introText.Text = "NextUI"
+        introText.Text = "Vantix UI"
         introText.Font = Enum.Font.GothamBlack
-        introText.TextSize = 5
+        introText.TextSize = 45
         introText.TextColor3 = Color3.fromRGB(255, 255, 255)
         introText.TextTransparency = 1
         introText.ZIndex = 102
         introText.Parent = introBg
         local glowText = Instance.new("TextLabel")
         glowText.Size = UDim2.new(1, 0, 0, 80)
-        glowText.Position = UDim2.new(0, 0, 0.6, 0)
+        glowText.Position = UDim2.new(0, 0, 0.5, 20)
         glowText.BackgroundTransparency = 1
-        glowText.Text = "NextUI"
+        glowText.Text = "Vantix UI"
         glowText.Font = Enum.Font.GothamBlack
-        glowText.TextSize = 5
+        glowText.TextSize = 45
         Theme:Apply(glowText, {TextColor3 = "Accent"})
         glowText.TextTransparency = 1
         glowText.ZIndex = 101
@@ -299,17 +300,29 @@ return function(Theme)
         function winObj:PlayIntro()
             screenGui.Enabled = true
             task.spawn(function()
-                tweenSvc:Create(introText, TweenInfo.new(1.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0.5, -40), TextSize = 75, TextTransparency = 0}):Play()
-                tweenSvc:Create(glowText, TweenInfo.new(1.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0.5, -40), TextSize = 80, TextTransparency = 0.6}):Play()
-                task.wait(1.5)
-                tweenSvc:Create(introText, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextColor3 = Theme.Current.Accent, TextSize = 85}):Play()
-                tweenSvc:Create(glowText, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextSize = 95, TextTransparency = 0.8}):Play()
+                -- Cinematic reveal: Slow fade and slide up
+                tweenSvc:Create(introText, TweenInfo.new(1.5, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0.5, -40), TextSize = 55, TextTransparency = 0}):Play()
+                tweenSvc:Create(glowText, TweenInfo.new(1.5, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0.5, -40), TextSize = 60, TextTransparency = 0.4}):Play()
+                task.wait(1.2)
+
+                -- Pulse effect: Expand slightly with color change
+                tweenSvc:Create(introText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextColor3 = Theme.Current.Accent, TextSize = 65}):Play()
+                tweenSvc:Create(glowText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextSize = 75, TextTransparency = 0.1}):Play()
+                task.wait(0.9)
+
+                -- Dramatic collapse inward with rotation
+                tweenSvc:Create(introText, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {TextSize = 0, TextTransparency = 1, Rotation = 5}):Play()
+                tweenSvc:Create(glowText, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {TextSize = 0, TextTransparency = 1, Rotation = -5}):Play()
                 task.wait(0.4)
-                tweenSvc:Create(introText, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 0.4, -100), TextSize = 0, TextTransparency = 1}):Play()
-                tweenSvc:Create(glowText, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 0.4, -100), TextSize = 0, TextTransparency = 1}):Play()
-                task.wait(0.7)
-                introBg:Destroy()
+
+                -- Screen fade out (dissolving the dark background)
+                tweenSvc:Create(introBg, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 1}):Play()
+                task.wait(0.2)
+
+                -- Main window pops up
                 tweenSvc:Create(mainFrm, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+                task.wait(0.4)
+                introBg:Destroy()
             end)
         end
         winObj.Container = contentContainer
