@@ -208,6 +208,10 @@ return function(Theme)
         tabListLayout.Padding = UDim.new(0, 8)
         tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
         tabListLayout.Parent = tabContainer
+        
+        tabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            tabContainer.CanvasSize = UDim2.new(0, 0, 0, tabListLayout.AbsoluteContentSize.Y + 30)
+        end)
         local tabPadding = Instance.new("UIPadding")
         tabPadding.PaddingTop = UDim.new(0, 15)
         tabPadding.PaddingLeft = UDim.new(0, 12)
